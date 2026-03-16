@@ -28,17 +28,7 @@ export function FinalGallery() {
     })
   }, [])
 
-  // Check if all images have been viewed to show ending
-  useEffect(() => {
-    if (viewedImages.size === galleryImages.length && !showEnding) {
-      // Small delay after viewing last image
-      const timer = setTimeout(() => {
-        setSelectedImage(null)
-        setShowEnding(true)
-      }, 500)
-      return () => clearTimeout(timer)
-    }
-  }, [viewedImages, showEnding])
+
 
   const openImage = (index: number) => {
     setSelectedImage(index)
@@ -51,9 +41,15 @@ export function FinalGallery() {
 
   const nextImage = () => {
     if (selectedImage !== null) {
-      const nextIndex = (selectedImage + 1) % galleryImages.length
-      setSelectedImage(nextIndex)
-      setViewedImages((prev) => new Set([...prev, nextIndex]))
+      // If on the last image, show ending message
+      if (selectedImage === galleryImages.length - 1) {
+        setSelectedImage(null)
+        setShowEnding(true)
+      } else {
+        const nextIndex = selectedImage + 1
+        setSelectedImage(nextIndex)
+        setViewedImages((prev) => new Set([...prev, nextIndex]))
+      }
     }
   }
 
@@ -217,9 +213,17 @@ export function FinalGallery() {
               e.stopPropagation()
               nextImage()
             }}
-            className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 p-3 bg-gold/20 hover:bg-gold/40 border border-gold/50 rounded-full text-gold transition-all z-10"
+            className={`absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 p-3 border border-gold/50 rounded-full text-gold transition-all z-10 ${
+              selectedImage === galleryImages.length - 1
+                ? "bg-gold/40 hover:bg-gold/60 animate-pulse"
+                : "bg-gold/20 hover:bg-gold/40"
+            }`}
           >
-            <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8" />
+            {selectedImage === galleryImages.length - 1 ? (
+              <Heart className="w-6 h-6 sm:w-8 sm:h-8 fill-current" />
+            ) : (
+              <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8" />
+            )}
           </button>
 
           {/* Image */}
