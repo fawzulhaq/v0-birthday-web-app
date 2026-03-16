@@ -122,19 +122,19 @@ export function BirthdayCake({ onAllCandlesBlown }: BirthdayCakeProps) {
   }, [candles])
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-b from-black via-gray-900 to-black flex flex-col items-center justify-center overflow-hidden">
-      {/* Background Text */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+    <div className="fixed inset-0 bg-gradient-to-b from-black via-gray-900 to-black flex flex-col items-center overflow-hidden">
+      {/* Happy Birthday Text at Top */}
+      <div className="pt-8 sm:pt-12 pb-4 sm:pb-6 text-center z-20">
         <h1
-          className="font-script text-pink text-center px-4"
-          style={{ fontSize: "clamp(32px, 10vw, 80px)" }}
+          className="font-script text-gold-gradient animate-pulse-gold px-4"
+          style={{ fontSize: "clamp(28px, 8vw, 64px)" }}
         >
           Happy Birthday Pancha
         </h1>
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 flex flex-col items-center">
+      <div className="relative z-10 flex flex-col items-center flex-1 justify-center">
         {/* Candles */}
         <div className="flex gap-4 sm:gap-6 mb-0">
           {candles.map((candle, index) => (

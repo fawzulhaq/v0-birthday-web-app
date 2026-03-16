@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import { Heart, X } from "lucide-react"
+import { Heart, X, ChevronLeft, ChevronRight } from "lucide-react"
 
 const galleryImages = [
   { id: 1, src: "/images/gallery-1.jpg", caption: "Our First Adventure" },
@@ -17,6 +17,7 @@ export function FinalGallery() {
   const [showEnding, setShowEnding] = useState(false)
   const [selectedImage, setSelectedImage] = useState<number | null>(null)
   const [visibleImages, setVisibleImages] = useState<number[]>([])
+  const [viewedImages, setViewedImages] = useState<Set<number>>(new Set())
 
   useEffect(() => {
     // Stagger image reveals
@@ -25,14 +26,56 @@ export function FinalGallery() {
         setVisibleImages((prev) => [...prev, index])
       }, index * 200)
     })
-
-    // Show ending after gallery is revealed
-    const endingTimer = setTimeout(() => {
-      setShowEnding(true)
-    }, galleryImages.length * 200 + 3000)
-
-    return () => clearTimeout(endingTimer)
   }, [])
+
+  // Check if all images have been viewed to show ending
+  useEffect(() => {
+    if (viewedImages.size === galleryImages.length && !showEnding) {
+      // Small delay after viewing last image
+      const timer = setTimeout(() => {
+        setSelectedImage(null)
+        setShowEnding(true)
+      }, 500)
+      return () => clearTimeout(timer)
+    }
+  }, [viewedImages, showEnding])
+
+  const openImage = (index: number) => {
+    setSelectedImage(index)
+    setViewedImages((prev) => new Set([...prev, index]))
+  }
+
+  const closeImage = () => {
+    setSelectedImage(null)
+  }
+
+  const nextImage = () => {
+    if (selectedImage !== null) {
+      const nextIndex = (selectedImage + 1) % galleryImages.length
+      setSelectedImage(nextIndex)
+      setViewedImages((prev) => new Set([...prev, nextIndex]))
+    }
+  }
+
+  const prevImage = () => {
+    if (selectedImage !== null) {
+      const prevIndex = selectedImage === 0 ? galleryImages.length - 1 : selectedImage - 1
+      setSelectedImage(prevIndex)
+      setViewedImages((prev) => new Set([...prev, prevIndex]))
+    }
+  }
+
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (selectedImage === null) return
+      if (e.key === "ArrowRight") nextImage()
+      if (e.key === "ArrowLeft") prevImage()
+      if (e.key === "Escape") closeImage()
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [selectedImage])
 
   return (
     <div className="fixed inset-0 bg-gradient-to-b from-gray-900 via-black to-gray-900 overflow-auto">
@@ -44,6 +87,9 @@ export function FinalGallery() {
         <p className="text-pink-light/70 text-sm sm:text-base">
           A collection of moments that make my heart smile, Pancha
         </p>
+        <p className="text-gold/50 text-xs mt-2">
+          Tap on each photo to view ({viewedImages.size}/{galleryImages.length} viewed)
+        </p>
       </div>
 
       {/* Gallery Grid */}
@@ -52,12 +98,12 @@ export function FinalGallery() {
           {galleryImages.map((image, index) => (
             <button
               key={image.id}
-              onClick={() => setSelectedImage(index)}
+              onClick={() => openImage(index)}
               className={`relative aspect-square rounded-xl overflow-hidden group transition-all duration-700 ${
                 visibleImages.includes(index)
                   ? "opacity-100 translate-y-0"
                   : "opacity-0 translate-y-8"
-              }`}
+              } ${viewedImages.has(index) ? "ring-2 ring-gold/50" : ""}`}
               style={{ transitionDelay: `${index * 100}ms` }}
             >
               <div className="absolute inset-0 bg-gray-800 flex items-center justify-center">
@@ -79,6 +125,13 @@ export function FinalGallery() {
                 </div>
               </div>
 
+              {/* Viewed indicator */}
+              {viewedImages.has(index) && (
+                <div className="absolute top-2 right-2 w-6 h-6 bg-gold/80 rounded-full flex items-center justify-center z-10">
+                  <Heart className="w-3 h-3 text-black fill-black" />
+                </div>
+              )}
+
               {/* Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
@@ -96,7 +149,7 @@ export function FinalGallery() {
 
       {/* Ending Message */}
       {showEnding && (
-        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 animate-fade-in-up">
+        <div className="fixed inset-0 bg-black/95 flex items-center justify-center z-50 animate-fade-in-up">
           <div className="text-center px-6">
             {/* Floating Hearts */}
             <div className="relative mb-8">
@@ -138,20 +191,47 @@ export function FinalGallery() {
         </div>
       )}
 
-      {/* Lightbox */}
-      {selectedImage !== null && (
+      {/* Lightbox with Slider */}
+      {selectedImage !== null && !showEnding && (
         <div
-          className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4"
-          onClick={() => setSelectedImage(null)}
+          className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center"
+          onClick={closeImage}
         >
+          {/* Close button */}
           <button
-            onClick={() => setSelectedImage(null)}
-            className="absolute top-4 right-4 p-2 text-foreground/70 hover:text-foreground transition-colors"
+            onClick={closeImage}
+            className="absolute top-4 right-4 p-2 text-foreground/70 hover:text-foreground transition-colors z-10"
           >
             <X className="w-8 h-8" />
           </button>
 
-          <div className="relative max-w-3xl w-full aspect-square">
+          {/* Previous button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              prevImage()
+            }}
+            className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 p-3 bg-gold/20 hover:bg-gold/40 border border-gold/50 rounded-full text-gold transition-all z-10"
+          >
+            <ChevronLeft className="w-6 h-6 sm:w-8 sm:h-8" />
+          </button>
+
+          {/* Next button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              nextImage()
+            }}
+            className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 p-3 bg-gold/20 hover:bg-gold/40 border border-gold/50 rounded-full text-gold transition-all z-10"
+          >
+            <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8" />
+          </button>
+
+          {/* Image */}
+          <div 
+            className="relative max-w-3xl w-full aspect-square mx-12 sm:mx-20"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Image
               src={galleryImages[selectedImage].src}
               alt={galleryImages[selectedImage].caption}
@@ -162,7 +242,7 @@ export function FinalGallery() {
                 target.style.display = "none"
               }}
             />
-            <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
+            <div className="absolute inset-0 flex items-center justify-center text-muted-foreground pointer-events-none">
               <div className="text-center">
                 <Heart className="w-16 h-16 mx-auto mb-2 text-pink/30" />
                 <p className="text-lg">Photo {galleryImages[selectedImage].id}</p>
@@ -170,9 +250,34 @@ export function FinalGallery() {
             </div>
           </div>
 
-          <p className="absolute bottom-8 left-0 right-0 text-center font-script text-xl text-gold">
-            {galleryImages[selectedImage].caption}
-          </p>
+          {/* Caption and Progress */}
+          <div className="absolute bottom-8 left-0 right-0 text-center px-4">
+            <p className="font-script text-xl sm:text-2xl text-gold mb-3">
+              {galleryImages[selectedImage].caption}
+            </p>
+            {/* Dots indicator */}
+            <div className="flex justify-center gap-2">
+              {galleryImages.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    openImage(index)
+                  }}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    index === selectedImage 
+                      ? "bg-gold w-6" 
+                      : viewedImages.has(index)
+                        ? "bg-gold/60"
+                        : "bg-gold/30"
+                  }`}
+                />
+              ))}
+            </div>
+            <p className="text-gold/50 text-xs mt-2">
+              {selectedImage + 1} / {galleryImages.length}
+            </p>
+          </div>
         </div>
       )}
 

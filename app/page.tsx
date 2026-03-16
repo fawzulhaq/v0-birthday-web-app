@@ -5,32 +5,53 @@ import { Countdown } from "@/components/birthday/countdown"
 import { BirthdayCake } from "@/components/birthday/birthday-cake"
 import { ScavengerHunt } from "@/components/birthday/scavenger-hunt"
 import { FinalGallery } from "@/components/birthday/final-gallery"
-import { BirthdayMelody } from "@/lib/audio"
 
 type Phase = "countdown" | "cake" | "hunt" | "gallery"
+
+// Pixabay music URL
+const BIRTHDAY_MUSIC_URL = "https://cdn.pixabay.com/download/audio/2024/08/27/audio_cd6c79be16.mp3?filename=happy-birthday-495860.mp3"
 
 export default function BirthdayPage() {
   const [phase, setPhase] = useState<Phase>("countdown")
   const [isPlaying, setIsPlaying] = useState(false)
-  const melodyRef = useRef<BirthdayMelody | null>(null)
+  const [audioLoaded, setAudioLoaded] = useState(false)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   // Initialize audio
   useEffect(() => {
-    melodyRef.current = new BirthdayMelody()
+    const audio = new Audio(BIRTHDAY_MUSIC_URL)
+    audio.loop = true
+    audio.volume = 0.5
+    audio.preload = "auto"
+    
+    audio.addEventListener("canplaythrough", () => {
+      setAudioLoaded(true)
+    })
+    
+    audio.addEventListener("error", () => {
+      console.log("[v0] Audio failed to load, continuing without music")
+      setAudioLoaded(true) // Still allow app to function
+    })
+
+    audioRef.current = audio
 
     return () => {
-      if (melodyRef.current) {
-        melodyRef.current.stop()
-        melodyRef.current = null
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current = null
       }
     }
   }, [])
 
   // Play music when entering cake phase
   useEffect(() => {
-    if (phase === "cake" && melodyRef.current && !isPlaying) {
-      melodyRef.current.play()
-      setIsPlaying(true)
+    if (phase === "cake" && audioRef.current && !isPlaying) {
+      audioRef.current.play().then(() => {
+        setIsPlaying(true)
+      }).catch(() => {
+        // Autoplay blocked, user needs to interact
+        console.log("[v0] Autoplay blocked, user interaction needed")
+      })
     }
   }, [phase, isPlaying])
 
@@ -39,10 +60,20 @@ export default function BirthdayPage() {
   }
 
   const handleCandlesBlown = () => {
-    // Stop music when candles are blown
-    if (melodyRef.current) {
-      melodyRef.current.stop()
-      setIsPlaying(false)
+    // Fade out music when candles are blown
+    if (audioRef.current && isPlaying) {
+      const fadeOut = setInterval(() => {
+        if (audioRef.current && audioRef.current.volume > 0.05) {
+          audioRef.current.volume -= 0.05
+        } else {
+          if (audioRef.current) {
+            audioRef.current.pause()
+            audioRef.current.volume = 0.5 // Reset for later
+          }
+          setIsPlaying(false)
+          clearInterval(fadeOut)
+        }
+      }, 100)
     }
 
     setTimeout(() => {
@@ -55,9 +86,17 @@ export default function BirthdayPage() {
   }
 
   const toggleMusic = () => {
-    if (melodyRef.current) {
-      const playing = melodyRef.current.toggle()
-      setIsPlaying(playing)
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause()
+        setIsPlaying(false)
+      } else {
+        audioRef.current.play().then(() => {
+          setIsPlaying(true)
+        }).catch(() => {
+          console.log("[v0] Audio play failed")
+        })
+      }
     }
   }
 

@@ -125,8 +125,10 @@ export function ScavengerHunt({ onComplete }: ScavengerHuntProps) {
               {/* Riddle */}
               <div className="flex items-start gap-3 mb-6">
                 <Sparkles className="w-6 h-6 text-gold flex-shrink-0 mt-1" />
-                <p className="text-foreground text-lg leading-relaxed font-script">
+                <p className="text-foreground text-lg sm:text-xl leading-relaxed font-sans tracking-wide" style={{ fontWeight: 400, letterSpacing: '0.02em' }}>
+                  <span className="text-gold text-2xl font-script">"</span>
                   {riddle.question}
+                  <span className="text-gold text-2xl font-script">"</span>
                 </p>
               </div>
 
