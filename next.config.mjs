@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export', // Add this line here
+  output: 'export',
+  basePath: '/v0-birthday-web-app',
+  assetPrefix: '/v0-birthday-web-app',
   typescript: {
     ignoreBuildErrors: true,
   },
