@@ -8,8 +8,8 @@ import { FinalGallery } from "@/components/birthday/final-gallery"
 
 type Phase = "countdown" | "cake" | "hunt" | "gallery"
 
-// Pixabay music URL
-const BIRTHDAY_MUSIC_URL = "https://cdn.pixabay.com/download/audio/2024/08/27/audio_cd6c79be16.mp3?filename=happy-birthday-495860.mp3"
+// Local birthday music file
+const BIRTHDAY_MUSIC_URL = "/audio/HBD.mp3"
 
 export default function BirthdayPage() {
   const [phase, setPhase] = useState<Phase>("countdown")

@@ -23,7 +23,7 @@ const riddles: Riddle[] = [
     question: "I'm the place where hearts first knew, something special was born, just between me and you. Where did our story begin?",
     hint: "Think about our first meaningful moment together...",
     answer: "heart",
-    image: "/images/1.jpg",
+    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1-WoPAJEMVYJGhEqLlhDWMYsUCdqrtBv.jpeg",
     memoryTitle: "Where It All Began",
   },
   {
@@ -31,7 +31,7 @@ const riddles: Riddle[] = [
     question: "I'm not a word, but I speak so loud. In your eyes, I see it proud. What feeling makes us who we are?",
     hint: "The most powerful feeling in the world...",
     answer: "love",
-    image: "/images/2.jpg",
+    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2-Gy2s9r8yZZJLeFgOuEOzFxiWY70Is7.jpeg",
     memoryTitle: "A Beautiful Moment",
   },
   {
@@ -39,7 +39,7 @@ const riddles: Riddle[] = [
     question: "We laugh, we cry, we share our dreams. In every moment, our bond just gleams. What are we called, you and me?",
     hint: "Two people who share everything...",
     answer: "soulmates",
-    image: "/images/3.jpg",
+    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/3-o9TvSIeEv2QusN9X99b4NRmLD1asWL.jpeg",
     memoryTitle: "Forever Together",
   },
 ]
@@ -125,10 +125,10 @@ export function ScavengerHunt({ onComplete }: ScavengerHuntProps) {
               {/* Riddle */}
               <div className="flex items-start gap-3 mb-6">
                 <Sparkles className="w-6 h-6 text-gold flex-shrink-0 mt-1" />
-                <p className="text-foreground text-lg sm:text-xl leading-relaxed font-sans tracking-wide" style={{ fontWeight: 400, letterSpacing: '0.02em' }}>
-                  <span className="text-gold text-2xl font-script">"</span>
+                <p className="text-foreground text-lg sm:text-xl leading-relaxed font-script" style={{ fontWeight: 400 }}>
+                  <span className="text-gold text-3xl">"</span>
                   {riddle.question}
-                  <span className="text-gold text-2xl font-script">"</span>
+                  <span className="text-gold text-3xl">"</span>
                 </p>
               </div>
 
@@ -175,23 +175,13 @@ export function ScavengerHunt({ onComplete }: ScavengerHuntProps) {
               {/* Memory Revealed */}
               <div className="text-center">
                 <h3 className="font-script text-2xl text-gold mb-4">{riddle.memoryTitle}</h3>
-                <div className="relative aspect-[4/3] w-full mb-6 rounded-xl overflow-hidden bg-gray-800">
+                <div className="relative aspect-[4/3] w-full mb-6 rounded-xl overflow-hidden bg-gray-800 border-2 border-gold/30">
                   <Image
                     src={riddle.image}
                     alt={riddle.memoryTitle}
                     fill
                     className="object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement
-                      target.style.display = "none"
-                    }}
                   />
-                  <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
-                    <div className="text-center">
-                      <Heart className="w-12 h-12 mx-auto mb-2 text-pink/50" />
-                      <p className="text-sm">Memory Photo {riddle.id}</p>
-                    </div>
-                  </div>
                 </div>
 
                 <button
