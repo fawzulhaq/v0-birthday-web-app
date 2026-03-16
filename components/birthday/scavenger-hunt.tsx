@@ -15,6 +15,7 @@ interface Riddle {
   answer: string
   image: string
   memoryTitle: string
+  objectPosition: string
 }
 
 const riddles: Riddle[] = [
@@ -25,6 +26,7 @@ const riddles: Riddle[] = [
     answer: "heart",
     image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1-WoPAJEMVYJGhEqLlhDWMYsUCdqrtBv.jpeg",
     memoryTitle: "Where It All Began",
+    objectPosition: "top",
   },
   {
     id: 2,
@@ -33,6 +35,7 @@ const riddles: Riddle[] = [
     answer: "love",
     image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2-Gy2s9r8yZZJLeFgOuEOzFxiWY70Is7.jpeg",
     memoryTitle: "A Beautiful Moment",
+    objectPosition: "center",
   },
   {
     id: 3,
@@ -41,6 +44,7 @@ const riddles: Riddle[] = [
     answer: "soulmates",
     image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/3-o9TvSIeEv2QusN9X99b4NRmLD1asWL.jpeg",
     memoryTitle: "Forever Together",
+    objectPosition: "top",
   },
 ]
 
@@ -175,12 +179,13 @@ export function ScavengerHunt({ onComplete }: ScavengerHuntProps) {
               {/* Memory Revealed */}
               <div className="text-center">
                 <h3 className="font-script text-2xl text-gold mb-4">{riddle.memoryTitle}</h3>
-                <div className="relative aspect-[4/3] w-full mb-6 rounded-xl overflow-hidden bg-gray-800 border-2 border-gold/30">
+                <div className="relative aspect-[3/4] w-full mb-6 rounded-xl overflow-hidden bg-gray-800 border-2 border-gold/30">
                   <Image
                     src={riddle.image}
                     alt={riddle.memoryTitle}
                     fill
                     className="object-cover"
+                    style={{ objectPosition: riddle.objectPosition }}
                   />
                 </div>
 
