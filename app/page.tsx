@@ -9,7 +9,7 @@ import { FinalGallery } from "@/components/birthday/final-gallery"
 type Phase = "countdown" | "cake" | "hunt" | "gallery"
 
 // Local birthday music file
-const BIRTHDAY_MUSIC_URL = "/audio/HBD.mp3"
+const BIRTHDAY_MUSIC_URL = "/v0-birthday-web-app/audio/HBD.mp3"
 
 export default function BirthdayPage() {
   const [phase, setPhase] = useState<Phase>("countdown")
